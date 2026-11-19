@@ -65,7 +65,7 @@ async def get_payment(
         amount=payment.amount,
         currency=payment.currency,
         description=payment.description,
-        metadata=payment.metadata,
+        metadata=payment.metadata_,
         status=payment.status,
         idempotency_key=payment.idempotency_key,
         webhook_url=payment.webhook_url,

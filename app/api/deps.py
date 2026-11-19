@@ -1,12 +1,16 @@
 from typing import Annotated
-from app.config import settings
 
-from fastapi import HTTPException, Header, status
+from fastapi import Depends, Header, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config import settings
 from app.db.session import get_session
 from app.services.payments import Payments
 
-async def get_payments_service() -> Payments:
-    session = get_session()
+
+async def get_payments_service(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> Payments:
     return Payments(session)
 
 async def verify_api_key(x_api_key: Annotated[str | None, Header()] = None) -> None:
