@@ -8,7 +8,11 @@ dependencies = [
     "alembic>=1.20.1",
     "asyncpg>=0.32.0",
     "fastapi>=0.165.0",
-    "faststream>=0.7.8",
-    "sqlalchemy>=2.1.9",
+    "faststream[cli,rabbit]>=0.7.8",
+    "greenlet>=3.5.6",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.16.3",
+    "sqlalchemy[asyncio]>=2.1.9",
     "tenacity>=9.2.1",
+    "uvicorn>=0.54.0",
 ]
