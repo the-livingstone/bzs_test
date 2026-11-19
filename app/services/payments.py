@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.outbox import OutboxEvent
 from app.models.payment import Payment, PaymentStatus
 from app.schemas.payment import PaymentCreate
 
@@ -40,6 +41,14 @@ class Payments:
             status=PaymentStatus.pending,
         )
         self.session.add(payment)
+        await self.session.flush()
+
+        outbox = OutboxEvent(
+            aggregate_id = payment.id,
+            event_type=self.PAYMENTS_NEW_EVENT,
+            payload={"payment_id": str(payment.id)},
+        )
+        self.session.add(outbox)
         await self.session.commit()
         await self.session.refresh(payment)
         return payment
