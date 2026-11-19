@@ -6,6 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.payment import Payment, PaymentStatus
+from consumer.gateway import fake_payment_gateway
+from consumer.webhook import send_webhook
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +22,17 @@ async def process_payment_message(session: AsyncSession, payment_id: uuid.UUID):
         return
 
     #do the thing
-    payment.status = PaymentStatus.succeeded
+    success = fake_payment_gateway()
+    payment.status = PaymentStatus.succeeded if success else PaymentStatus.failed
     payment.processed_at = datetime.now(timezone.utc)
     await session.commit()
     await session.refresh(payment)
+    payload = {
+        "payment_id": str(payment.id),
+        "status": payment.status.value,
+        "amount": str(payment.amount),
+        "currency": payment.currency.value,
+        "processed_at": payment.processed_at.isoformat(),
+    }
+
+    await send_webhook(payment.webhook_url, payload)
