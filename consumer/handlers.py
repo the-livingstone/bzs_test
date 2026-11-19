@@ -22,7 +22,7 @@ async def process_payment_message(session: AsyncSession, payment_id: uuid.UUID):
         return
 
     #do the thing
-    success = fake_payment_gateway()
+    success = await fake_payment_gateway()
     payment.status = PaymentStatus.succeeded if success else PaymentStatus.failed
     payment.processed_at = datetime.now(timezone.utc)
     await session.commit()
@@ -35,4 +35,4 @@ async def process_payment_message(session: AsyncSession, payment_id: uuid.UUID):
         "processed_at": payment.processed_at.isoformat(),
     }
 
-    await send_webhook(payment.webhook_url, payload)
+    await send_webhook(url=payment.webhook_url, payload=payload)
