@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 
-from app.api.deps import get_payments_service
+from app.api.deps import get_payments_service, verify_api_key
 from app.schemas.payment import PaymentAcceptedResponse, PaymentCreate, PaymentDetailResponse
 from app.services.payments import Payments
 
@@ -14,6 +14,7 @@ router = APIRouter(prefix="/payments")
     "",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=PaymentAcceptedResponse,
+    dependencies=[Depends(verify_api_key)],
 )
 async def create_payment(
     body: PaymentCreate,
@@ -46,6 +47,7 @@ async def create_payment(
 @router.get(
     "/{payment_id}",
     response_model=PaymentDetailResponse,
+    dependencies=[Depends(verify_api_key)],
 )
 async def get_payment(
     payment_id: UUID,
